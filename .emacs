@@ -1,0 +1,118 @@
+;; -*- mode: elisp -*-
+
+;; Start in fullscreen mode
+
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+;; (package-initialize)
+
+(server-start)
+
+;; This is only needed once, near the top of the file
+(eval-when-compile
+  ;; Following line is not needed if use-package.el is in ~/.emacs.d
+ ;; (add-to-list 'load-path "<path where use-package is installed>")
+  (require 'use-package))
+
+
+
+;; Custom global keybindings
+(global-set-key (kbd "C-c c") (kbd "M-TAB"))
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-enabled-themes (quote (tango-dark)))
+ '(initial-frame-alist (quote ((fullscreen . maximized))))
+ '(package-selected-packages (quote (pdf-tools org-pdfview org-download pandoc-mode)))
+ '(tool-bar-mode nil))
+
+;; Automatically select *help* buffer
+(setq help-window-select t)
+
+;; Start in home directory
+(setq initial-buffer-choice "~/org")
+
+;; Open URLs in Chrome
+(setq browse-url-browser-function 'browse-url-chromium)
+(setq browse-url-browser-function 'browse-url-default-windows-browser)
+    
+
+;; MELPA
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+
+;; Prefer MSYS libraries
+(setenv "PATH" (concat "C:\\msys64\\mingw64\\bin;" (getenv "PATH")))
+
+;; Set Exec Path
+;; MSYS2
+(setenv "PATH" (concat (getenv "PATH") "C:\\msys64\\mingw64\\bin"))
+(setq exec-path (append exec-path '("/sw/bin")))
+;; Git
+(setenv "PATH" (concat (getenv "PATH") "C:\\Program\ Files\\Git"))
+(setq exec-path (append exec-path '("/sw/bin")))
+;; Chrome
+(setenv "PATH" (concat (getenv "PATH") "C:\\Program\ Files\ (x86)\\Google\\Chrome\\Application\\chrome.exe"))
+(setq exec-path (append exec-path '("/sw/bin")))
+
+;; pdf-tools
+(require 'pdf-tools)
+(use-package pdf-tools
+  :init
+  (pdf-tools-install)
+  (setq pdf-annot-activate-created-annotations t)
+  ;; pdf-tools custom keybindings
+  (define-key pdf-view-mode-map (kbd "h") 'pdf-annot-add-highlight-markup-annotation)
+  (define-key pdf-view-mode-map (kbd "t") 'pdf-annot-add-text-annotation)
+  (define-key pdf-view-mode-map (kbd "D") 'pdf-annot-delete)
+  ;; more fine-grained zooming
+  (setq pdf-view-resize-factor 1.1))
+
+;;;;Org-mode config
+;; Enable org-mode
+(require 'org)
+(add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
+(define-key global-map "\C-cl" 'org-store-link)
+(define-key global-map "\C-ca" 'org-agenda)
+(define-key org-mode-map (kbd "C-n") 'org-next-visible-heading)
+(define-key org-mode-map (kbd "C-p") 'org-previous-visible-heading)
+(setq org-log-done t)
+(setq org-return-follows-link t)
+;; Make org-mode work with files ending in .org
+;; (add-to-list 'auto-mode-alist '("\\.org$" . org-mode))
+;; The above is the default in recent emacsen
+(add-hook 'org-mode-hook 'org-indent-mode)
+(add-hook 'markdown-mode-hook 'pandoc-mode)
+;; Org-mode links for PDF
+(eval-after-load 'org '(require 'org-pdfview))
+(add-to-list 'org-file-apps 
+             '("\\.pdf\\'" . (lambda (file link)
+                                     (org-pdfview-open link))))
+
+
+
+;; load emacs 24's package system. Add MELPA repository.
+(when (>= emacs-major-version 24)
+  (require 'package)
+  (add-to-list
+   'package-archives
+   ;; '("melpa" . "http://stable.melpa.org/packages/") ; many packages won't show if using stable
+   '("melpa" . "http://melpa.milkbox.net/packages/")
+   t))
+
+;; Word wrapping
+(add-hook 'text-mode-hook 'turn-on-auto-fill)
+(setq truncate-lines 'nil)
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+
